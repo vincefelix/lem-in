@@ -25,7 +25,10 @@ func (p *Paths) Sortpaths() {
 }
 
 // -------------------------------//
-func path_passer(pathtab Paths, antsize int) []int {
+func ant_per_path(pathtab Paths, antsize int) []int {
+	if pathtab.Len() != antsize {
+		return nil
+	}
 	passing_ant := make([]int, pathtab.Len())
 	roomsize := make([]int, pathtab.Len())
 	for i := range roomsize {
@@ -47,35 +50,43 @@ func path_passer(pathtab Paths, antsize int) []int {
 
 		}
 	}
-
-
-
 	//removing the nil slices
 	for i, v := range passing_ant {
 		if v == 0 {
-			passing_ant = append(passing_ant[:i], passing_ant[i+1:]...)
+			if i < len(passing_ant)-1 {
+				passing_ant = append(passing_ant[:i], passing_ant[i+1:]...)
+			} else if i == len(passing_ant)-1 {
+				passing_ant = passing_ant[:i]
+			}
 		}
 	}
 
 	return passing_ant
 }
 
-func Sequences(ants int, tab Paths) {
-	passers := path_passer(tab, ants)
+func Sequences(antsize int, tab Paths) {
+	passers := ant_per_path(tab, antsize)
 	fmt.Println("ants per path")
 	fmt.Println(passers)
-	initial := ants
-	for i := 1; initial >= 0; i++ {
-		for j := 0; j < tab.Len(); j++ {
-			if i < len(tab[j]) {
-				if j < len(tab[j]) {
-					step := fmt.Sprintf("L%v-L%s ", j+1, tab[j][i])
-					fmt.Print(step)
+	initial := antsize
+	if antsize == tab.Len() {
+		for i := 1; initial >= 0; i++ {
+			for j := 0; j < tab.Len(); j++ {
+				if i < len(tab[j]) {
+					if j < len(tab[j]) {
+						step := fmt.Sprintf("L%v-L%s ", j+1, tab[j][i])
+						passers[j] -= 1
+						fmt.Print(step)
+					}
 				}
+
 			}
+
+			initial--
+			println()
 		}
-		initial--
-		println()
+	} else {
+		fmt.Println("--second case--")
 	}
 }
 
