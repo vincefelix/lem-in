@@ -26,9 +26,6 @@ func (p *Paths) Sortpaths() {
 
 // -------------------------------//
 func ant_per_path(pathtab Paths, antsize int) []int {
-	if pathtab.Len() != antsize {
-		return nil
-	}
 	passing_ant := make([]int, pathtab.Len())
 	roomsize := make([]int, pathtab.Len())
 	for i := range roomsize {
@@ -65,28 +62,39 @@ func ant_per_path(pathtab Paths, antsize int) []int {
 }
 
 func Sequences(antsize int, tab Paths) {
+	mirror := 0
 	passers := ant_per_path(tab, antsize)
 	fmt.Println("ants per path")
 	fmt.Println(passers)
 	initial := antsize
-	if antsize == tab.Len() {
-		for i := 1; initial >= 0; i++ {
-			for j := 0; j < tab.Len(); j++ {
-				if i < len(tab[j]) {
-					if j < len(tab[j]) {
+	for i := 1; initial >= 0; i++ {
+		for j := 0; j < tab.Len(); j++ {
+			if i < len(tab[j]) {
+				if j < len(tab[j]) {
+					if i == 1 {
 						step := fmt.Sprintf("L%v-L%s ", j+1, tab[j][i])
-						passers[j] -= 1
 						fmt.Print(step)
+					} else {
+						var add_on []string
+						for k := 0; k < mirror; k++ {
+							add_on = append(add_on, "*")
+						}
+						for _, v := range tab[mirror] {
+							add_on = append(add_on, v)
+						}
+						tab = append(tab, tab[mirror])
+						mirror++
+						step := fmt.Sprintf("L%v-L%s ", j+1, tab[j][i])
+						fmt.Print(step)
+
 					}
 				}
-
 			}
 
-			initial--
-			println()
 		}
-	} else {
-		fmt.Println("--second case--")
+
+		initial--
+		println()
 	}
 }
 
