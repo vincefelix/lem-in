@@ -1,20 +1,15 @@
 package main
 
 import (
-	lmin "lem_in/tools"
+	"fmt"
+	ant "lem_in/tools"
+	"os"
 )
 
 func main() {
-	var anthill lmin.Ant
-
-	antsize := 2
-	path_tab := [][]string{
-		{""},
+	if len(os.Args) != 2 {
+		fmt.Println("Error: Review arguments")
+		return
 	}
-
-	anthill = anthill.Path(path_tab)
-	anthill.Ant_per_path(antsize, path_tab)
-	anthill.Reorder(path_tab, antsize)
-	anthill.PrintSeq(path_tab)
-
+	ant.Lem_in_prog()
 }

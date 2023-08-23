@@ -2,8 +2,6 @@ package lem_in
 
 import "strconv"
 
-// func Sort(table []string, pathsize int)
-//
 // it sorts the array in ascending name order
 func Sort(table []string) {
 	var t string
@@ -22,8 +20,6 @@ func Sort(table []string) {
 	}
 }
 
-//func GetNumber(n string) int
-//
 // it trims and return the between the <L> and <->
 func GetNumber(n string) int {
 	number := ""
@@ -43,4 +39,17 @@ func GetNumber(n string) int {
 	}
 	return newnumber
 
+}
+
+func isNumber(value string) bool {
+	num, err := strconv.Atoi(value)
+
+	if err != nil && num == 0 {
+		return false
+	}
+	return true
+}
+func Atoi(str string) int {
+	num, _ := strconv.Atoi(str)
+	return num
 }

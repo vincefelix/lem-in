@@ -35,7 +35,6 @@ func (anthill Ant) Sequence() map[int][]string {
 			}
 			count++
 		}
-
 	}
 	return sequences
 }
