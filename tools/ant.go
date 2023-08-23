@@ -90,7 +90,7 @@ func (anthill Ant) Ant_per_path(antsize int, tab [][]string) {
 }
 
 // it reorders the colony's movement by changing their names to entrance order
-func (anthill Ant) Reorder(path_tab [][]string) {
+func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 	if len(path_tab) > 1 { //multiple path case
 		for i := range anthill {
 			index := i + 1
@@ -103,8 +103,8 @@ func (anthill Ant) Reorder(path_tab [][]string) {
 					//by adding the paths number to each ant's passing order index
 					// we get his entrance number
 					index += len(path_tab)
-					if index > 9 {
-						index -= 1
+					if index > antsize {
+						index = antsize
 					}
 
 					new_passing_order = append(new_passing_order, index)
@@ -124,7 +124,7 @@ func (anthill Ant) PrintSeq(path_tab [][]string) {
 	for i := 0; i < len(steps); i++ {
 		slice := steps[i]
 
-		Sort(slice, len(path_tab))
+		Sort(slice)
 
 		for j := 0; j < len(slice); j++ {
 			if j == len(slice)-1 {
