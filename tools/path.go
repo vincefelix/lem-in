@@ -182,15 +182,12 @@ func OptimizedPaths(rooms [][]*Room) [][]*Room {
 }
 
 func noRepeat(t [][]string) [][]string {
-	fmt.Println("initial tab : ", t)
 	size := 0
 	for i := range t {
-		fmt.Println("before: ", t[i])
 		if i > 0 {
 			size += len(t[i-1])
 			t[i] = t[i][size:]
 		}
-		fmt.Println("After: ", t[i])
 	}
 	return t
 }
