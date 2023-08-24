@@ -207,11 +207,22 @@ func HasCollision(room []*Room, Ways [][]*Room) bool {
 	}
 	return false
 }
+func ConvertToValueSlice(roomsPointers []*Room) []Room {
+	var rooms []Room
+
+	for _, roomPointer := range roomsPointers {
+		if roomPointer != nil {
+			rooms = append(rooms, *roomPointer)
+		}
+	}
+
+	return rooms
+}
 
 func IsCollision(room1, room2 []*Room) bool {
-	for i := 0; i < len(room1)-1; i++ {
-		for j := 0; j < len(room2)-1; j++ {
-			if room1[i] == room2[j] && room1[i+1] == room2[j+1] {
+	for i := 1; i < len(room1)-1; i++ {
+		for j := 1; j < len(room2)-1; j++ {
+			if room1[i].Name == room2[j].Name && room1[i+1].Name == room2[j+1].Name || ((room1[i] == room1[0] || room2[j] == room2[0]) || (room1[i] == room1[len(room1)-1] || room2[j] == room2[len(room2)-1])) {
 				return true
 			}
 		}
