@@ -7,11 +7,11 @@ import (
 
 func Lem_in_prog() {
 	filename := os.Args[1]
-	// validFile, err := CheckValidityFile(filename)
-	// if !validFile {
-	// 	fmt.Printf("ERROR: invalid data format, %v \n", err)
-	// 	return
-	// }
+	validFile, err := CheckValidityFile(filename)
+	if !validFile {
+		fmt.Printf("ERROR: invalid data format, %v \n", err)
+		return
+	}
 	var anthill Ant
 
 	antsize, chambre, _, _ := parseFile(filename)
@@ -20,11 +20,7 @@ func Lem_in_prog() {
 	Allpaths := findPathsBFS(startRoom, endRoom)
 	PathOptimized := OptimizedPaths(Allpaths)
 	path_tab := ConvertToString(PathOptimized)
-	fmt.Println("before norepeat: ", path_tab)
 	path_tab = noRepeat(path_tab)
-	fmt.Println("-------------------------------------------------")
-	fmt.Println(path_tab)
-	fmt.Println("-------------------------------------------------")
 
 	anthill = anthill.Path(path_tab)
 	anthill.Ant_per_path(numAnts, path_tab)
