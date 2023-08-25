@@ -219,7 +219,7 @@ func ConvertToValueSlice(roomsPointers []*Room) []Room {
 func IsCollision(room1, room2 []*Room) bool {
 	for i := 1; i < len(room1)-1; i++ {
 		for j := 1; j < len(room2)-1; j++ {
-			if room1[i].Name == room2[j].Name && room1[i+1].Name == room2[j+1].Name || ((room1[i] == room1[0] || room2[j] == room2[0]) || (room1[i] == room1[len(room1)-1] || room2[j] == room2[len(room2)-1])) {
+			if room1[i].Name == room2[j].Name  {
 				return true
 			}
 		}

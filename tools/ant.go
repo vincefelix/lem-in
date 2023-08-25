@@ -2,6 +2,7 @@ package lem_in
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -78,18 +79,34 @@ func (anthill Ant) Ant_per_path(antsize int, tab [][]string) {
 			}
 
 		}
-	}
-	//--single path case
-	//giving it the colony size and name ants from index 1 to the ants number
-	anthill[0].Ant_nbr += antsize - 1
-	for i := 1; i <= antsize; i++ {
-		anthill[0].Passing_order = append(anthill[0].Passing_order, i)
+	} else {
+		//--single path case
+		//giving it the colony size and name ants from index 1 to the ants number
+		anthill[0].Ant_nbr += antsize - 1
+		for i := 1; i <= antsize; i++ {
+			anthill[0].Passing_order = append(anthill[0].Passing_order, i)
+		}
 	}
 
 }
 
 // it reorders the colony's movement by changing their names to entrance order
 func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
+	for i := range path_tab {
+		fmt.Printf("this is path %v : %v\n", i, path_tab[i])
+	}
+	var order [][]int
+
+	for b := range anthill {
+		order = append(order, anthill[b].Passing_order)
+	}
+
+	size := sumOfColumn(order)
+	fmt.Println("size per turn : ", size)
+	println()
+	fmt.Println("before order : ", anthill)
+
+	// maxpath := Maxpath(path_tab)
 	if len(path_tab) > 1 { //multiple path case
 		for i := range anthill {
 			index := i + 1
@@ -99,25 +116,51 @@ func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 				if v == 0 {
 					new_passing_order = append(new_passing_order, index)
 				} else {
+
 					//by adding the paths number to each ant's passing order index
 					// we get his entrance number
-					index += len(path_tab)
+
+					if len(path_tab) > 3 {
+						if size[v] < size[v-1] {
+							index = size[v] + anthill[i].Passing_order[v-1] + (size[v-1] - size[v])
+						} else {
+							index = size[v] + anthill[i].Passing_order[v-1]
+
+						}
+					} else {
+
+						if size[v] < size[v-1] {
+							index = size[v] + anthill[i].Passing_order[v-1] + (size[v-1] - size[v])
+						} else {
+							index = size[v] + anthill[i].Passing_order[v-1]
+
+						}
+
+					}
+
 					if index > antsize {
 						index = antsize
 					}
 
 					new_passing_order = append(new_passing_order, index)
 				}
+				anthill[i].Passing_order = new_passing_order
 			}
-
-			anthill[i].Passing_order = new_passing_order
 		}
-	}
 
+	}
+	fmt.Println("after order : ")
+	for l := range anthill {
+		fmt.Println(l, "-", anthill[l].Ant_nbr, anthill[l].Passing_order)
+	}
+	println()
 }
 
 // PrintSeq prints the sequences after sorting the sequences after we reordered the moves
 func (anthill Ant) PrintSeq(path_tab [][]string) {
+	file, _ := os.ReadFile(os.Args[1])
+	fmt.Println(string(file))
+	fmt.Println()
 	steps := anthill.Sequence()
 
 	for i := 0; i < len(steps); i++ {

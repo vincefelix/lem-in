@@ -20,6 +20,43 @@ func Sort(table []string) {
 	}
 }
 
+func Maxpath(pathtab [][]string) int {
+	size := len(pathtab[0])
+	for i := range pathtab {
+		if len(pathtab[i]) > size {
+			size = len(pathtab[i])
+		}
+	}
+	return size
+}
+
+func sumOfColumn(room [][]int) []int {
+	var columnSizes []int
+
+	if len(room) == 0 {
+		return columnSizes
+	}
+
+	maxRowLength := 0
+	for _, row := range room {
+		if len(row) > maxRowLength {
+			maxRowLength = len(row)
+		}
+	}
+
+	for j := 0; j < maxRowLength; j++ {
+		columnSize := 0
+		for i := 0; i < len(room); i++ {
+			if j < len(room[i]) {
+				columnSize++
+			}
+		}
+		columnSizes = append(columnSizes, columnSize)
+	}
+
+	return columnSizes
+}
+
 // it trims and return the between the <L> and <->
 func GetNumber(n string) int {
 	number := ""

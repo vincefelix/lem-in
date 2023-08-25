@@ -2,7 +2,6 @@ package lem_in
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -14,7 +13,7 @@ func FileToTable(filename string) []string {
 	var lines []string
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Erreur: nous ne parvenons pas a lire le fichier")
+		return nil
 	} else {
 		example := bufio.NewScanner(file)
 
@@ -122,6 +121,9 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 
 func CheckValidityFile(filename string) (valide bool, err string) {
 	lines := FileToTable(filename)
+	if lines == nil {
+		return false, "wrong file name"
+	}
 	number_of_ants, _ := strconv.Atoi(lines[0])
 	rooms, links := Classification(lines)
 	// validity := false
