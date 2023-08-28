@@ -173,6 +173,11 @@ func findNonCollidingPaths(inputPaths [][]*Room) [][]*Room {
 		}
 	}
 
+	if len(optimalPaths) < 1 {
+		fmt.Println("ERROR: invalid data format, No path")
+		os.Exit(0)
+	}
+
 	correct := optimalPaths[longestPathIndex]
 
 	return (OptimizedPaths(correct))
@@ -235,3 +240,29 @@ func ConvertToValueSlice(roomsPointers []*Room) []Room {
 	return rooms
 }
 
+//Repeated_cmd check wether the room start or end is repeated or not
+func Repetead_cmd(allpaths []*Room) bool {
+	rep := false
+	start := allpaths[0]
+	end := allpaths[len(allpaths)-1]
+
+	for _, el := range allpaths[1 : len(allpaths)-1] {
+		if el == start || el == end {
+			rep = true
+			break
+		}
+
+	}
+
+	return rep
+}
+
+//Deleteroom removes a path where the command room start or end is repeated from the anthill
+func Deleteroom(allpaths [][]*Room) [][]*Room {
+	for i := range allpaths {
+		if Repetead_cmd(allpaths[i]) {
+			allpaths = append(allpaths[:i], allpaths[i+1:]...)
+		}
+	}
+	return allpaths
+}

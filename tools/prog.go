@@ -16,12 +16,12 @@ func Lem_in_prog() {
 		fmt.Println("empty file")
 	} else if error == nil && len(lines) > 0 {
 		valid, answer := CheckValidityFile(lines)
+
 		if valid {
-			// CreateAndWriteInAFile("newfilename.txt",lines)
-			// fmt.Println(valid)
+
 			var anthill Ant
 
-			antsize, chambre, _, _ := parseFile("newfilename.txt")
+			antsize, chambre, _, _ := parseFile("tools/newfilename.txt")
 			startRoom := StartRoom(chambre)
 			endRoom := EndRoom(chambre)
 			Allpaths := findPathsBFS(startRoom, endRoom)
@@ -34,15 +34,10 @@ func Lem_in_prog() {
 			anthill.Ant_per_path(numAnts, path_tab)
 			anthill.Reorder(path_tab, antsize)
 			anthill.PrintSeq(path_tab)
+			
 		} else {
-			fmt.Printf("ERROR: invalid data format, %v", answer)
+			fmt.Printf("ERROR: invalid data format, %v\n", answer)
 		}
 	}
-
-	// validFile, err := CheckValidityFile(filename)
-	// if !validFile {
-	// 	fmt.Printf("ERROR: invalid data format, %v \n", err)
-	// 	return
-	// }
 
 }

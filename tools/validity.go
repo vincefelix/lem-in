@@ -183,7 +183,12 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 		if len(link) != 2 {
 			err := "invalid link format "
 			return false, err
+	
 		} else {
+			if !contains(links,links[i]){
+				err := "repeat link "
+				return false, err
+			}
 			if link[0] == link[1] {
 				err := "room connected to itself "
 				return false, err
@@ -196,6 +201,17 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 
 	return true, ""
 }
+
+func contains(links []string, link string) bool {
+	count := 0
+	for i := 0; i < len(links); i++ {
+		if links[i] == link {
+			count++
+		}
+	}
+	return count == 1
+}
+
 func CreateAndWriteInAFile(output string, finalContent []string) {
 	//création du fichier de sortie
 	newFile, _ := os.Create(output)
@@ -260,7 +276,7 @@ func CheckValidityFile(lines []string) (validity bool, answer string) {
 			// fmt.Println("rooms", rooms)
 			// fmt.Println("links", links)
 			tab := reconstruction(rooms, links, lines[0])
-			CreateAndWriteInAFile("newfilename.txt", tab)
+			CreateAndWriteInAFile("tools/newfilename.txt", tab)
 
 		} else {
 			validity, answer = false, "the ##start & ##end commands must each be 1."

@@ -100,8 +100,6 @@ func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 
 	size := sumOfColumn(order)
 
-
-	// maxpath := Maxpath(path_tab)
 	if len(path_tab) > 1 { //multiple path case
 		for i := range anthill {
 			index := i + 1
@@ -125,7 +123,16 @@ func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 					} else {
 
 						if size[v] < size[v-1] {
-							index = size[v] + anthill[i].Passing_order[v-1] + (size[v-1] - size[v])
+
+							if v == len(size)-1 {
+								index = size[v] + anthill[i].Passing_order[v-1] + (size[v-1] - size[v])
+							} else if (size[v-1] - size[v]) > 1 {
+								index = anthill[i].Passing_order[v-1] + (size[v-1] - size[v] )
+								} else {
+								index = size[v]+ anthill[i].Passing_order[v-1] + 1
+
+							}
+
 						} else {
 							index = size[v] + anthill[i].Passing_order[v-1]
 
