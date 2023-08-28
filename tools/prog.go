@@ -10,15 +10,18 @@ func Lem_in_prog() {
 	lines, error := FileToTable(filename)
 	lines = linesWithoutExtraSpaces(lines)
 	lines = deleteComments(lines)
+	lines=trimspacesinlines(lines)
+	
 	if len(lines) == 0 && error == nil {
 		fmt.Println("empty file")
 	} else if error == nil && len(lines) > 0 {
 		valid, answer := CheckValidityFile(lines)
 		if valid {
+			// CreateAndWriteInAFile("newfilename.txt",lines)
 			// fmt.Println(valid)
 			var anthill Ant
 
-			antsize, chambre, _, _ := parseFile(filename)
+			antsize, chambre, _, _ := parseFile("newfilename.txt")
 			startRoom := StartRoom(chambre)
 			endRoom := EndRoom(chambre)
 			Allpaths := findPathsBFS(startRoom, endRoom)

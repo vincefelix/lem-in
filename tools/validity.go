@@ -182,14 +182,14 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 	for i := 0; i < len(links); i++ {
 		link := strings.Split(links[i], "-")
 		if len(link) != 2 {
-			err := "invalid link format " + link[i]
+			err := "invalid link format "
 			return false, err
 		} else {
 			if link[0] == link[1] {
-				err := "room connected to itself " + link[i]
+				err := "room connected to itself "
 				return false, err
 			} else if !names[link[0]] || !names[link[1]] {
-				err := "non-existent room name " + link[i]
+				err := "non-existent room name "
 				return false, err
 			}
 		}
@@ -197,7 +197,48 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 
 	return true, ""
 }
+func CreateAndWriteInAFile(output string, finalContent []string) {
+	//création du fichier de sortie
+	newFile, _ := os.Create(output)
+	//écriture dans le nouveau fichier
+	// writeInFile, _ := newFile.WriteString(finalContent)
+	for i := 0; i < len(finalContent); i++ {
+		if i != len(finalContent)-1 {
+			_, err := newFile.WriteString(finalContent[i] + "\n")
+			if err != nil {
+				fmt.Println("error detected")
+			}
+		} else {
+			_, err := newFile.WriteString(finalContent[i])
+			if err != nil {
+				fmt.Println("error detected")
+			}
+		}
+	}
 
+	// fmt.Printf("last: %v\n", writeInFile)
+
+}
+func reconstruction(rooms []string, links []string, number string) (tablines []string) {
+	tablines = append(tablines, number)
+	for i := 0; i < len(rooms); i++ {
+		if i == 0 {
+			tablines = append(tablines, "##start"+"\n"+rooms[i])
+		} else if i == len(rooms)-1 {
+			tablines = append(tablines, "##end"+"\n"+rooms[i])
+
+		} else {
+			tablines = append(tablines, rooms[i])
+
+		}
+	}
+	for i := 0; i < len(links); i++ {
+		tablines = append(tablines, links[i])
+
+	}
+
+	return tablines
+}
 func CheckValidityFile(lines []string) (validity bool, answer string) {
 	// fmt.Println(lines,"first")
 	//delete empty lines
@@ -208,6 +249,7 @@ func CheckValidityFile(lines []string) (validity bool, answer string) {
 	// fmt.Println(lines, "trim space")
 	//delete all the comments
 	lines = deleteComments(lines)
+
 	// fmt.Println(lines, "delete comments")
 	//assign the first line of the table as the number of ants
 	number_of_ants, _ := strconv.Atoi(lines[0])
@@ -216,6 +258,10 @@ func CheckValidityFile(lines []string) (validity bool, answer string) {
 		if StartAndEnd(lines) {
 			rooms, links := dispatchingLinesAndRooms(lines)
 			validity, answer = RoomAndLinksFormat(rooms, links)
+			// fmt.Println("rooms", rooms)
+			// fmt.Println("links", links)
+			tab := reconstruction(rooms, links, lines[0])
+			CreateAndWriteInAFile("newfilename.txt", tab)
 
 		} else {
 			validity, answer = false, "the ##start & ##end commands must each be 1."
@@ -227,6 +273,7 @@ func CheckValidityFile(lines []string) (validity bool, answer string) {
 	}
 	return validity, answer
 }
+
 // func main() {
 // 	if len(os.Args) == 2 {
 // 		lines, error := FileToTable(os.Args[1])
