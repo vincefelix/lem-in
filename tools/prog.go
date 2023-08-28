@@ -20,9 +20,6 @@ func Lem_in_prog() {
 	Allpaths := findPathsBFS(startRoom, endRoom)
 
 	PathOptimized := findNonCollidingPaths(Allpaths)
-	fmt.Println("-------------------findOptimalPaths----------------------------")
-	fmt.Println(noRepeat(ConvertToString(PathOptimized)))
-	fmt.Println("----------------------findOptimalPaths-------------------------")
 	path_tab := ConvertToString(PathOptimized)
 	path_tab = noRepeat(path_tab)
 

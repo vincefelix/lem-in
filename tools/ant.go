@@ -92,9 +92,6 @@ func (anthill Ant) Ant_per_path(antsize int, tab [][]string) {
 
 // it reorders the colony's movement by changing their names to entrance order
 func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
-	for i := range path_tab {
-		fmt.Printf("this is path %v : %v\n", i, path_tab[i])
-	}
 	var order [][]int
 
 	for b := range anthill {
@@ -102,9 +99,7 @@ func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 	}
 
 	size := sumOfColumn(order)
-	fmt.Println("size per turn : ", size)
-	println()
-	fmt.Println("before order : ", anthill)
+
 
 	// maxpath := Maxpath(path_tab)
 	if len(path_tab) > 1 { //multiple path case
@@ -149,11 +144,6 @@ func (anthill Ant) Reorder(path_tab [][]string, antsize int) {
 		}
 
 	}
-	fmt.Println("after order : ")
-	for l := range anthill {
-		fmt.Println(l, "-", anthill[l].Ant_nbr, anthill[l].Passing_order)
-	}
-	println()
 }
 
 // PrintSeq prints the sequences after sorting the sequences after we reordered the moves

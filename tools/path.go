@@ -235,13 +235,3 @@ func ConvertToValueSlice(roomsPointers []*Room) []Room {
 	return rooms
 }
 
-func isCollision(room1, room2 []*Room) bool {
-	for i := 1; i < len(room1)-1; i++ {
-		for j := 1; j < len(room2)-1; j++ {
-			if room1[i].Name == room2[j].Name {
-				return true
-			}
-		}
-	}
-	return false
-}
