@@ -121,41 +121,7 @@ func findRoom(rooms []Room, name string) *Room {
 	}
 	return nil
 }
-func FindPathsBFS(startRoom *Room, endRoom *Room) [][]*Room {
-	var paths [][]*Room
-	queue := [][]*Room{{startRoom}}
-	fmt.Println(startRoom.Name)
-	fmt.Println(endRoom.Name)
 
-	for len(queue) > 0 {
-		path := queue[0]
-		queue = queue[1:]
-		currentRoom := path[len(path)-1]
-
-		if currentRoom.Name == endRoom.Name {
-			copiedPath := make([]*Room, len(path))
-			copy(copiedPath, path)
-			paths = append(paths, copiedPath)
-		}
-
-		for _, neighbor := range currentRoom.Links {
-			// Check if the neighbor is not already in the current path
-			alreadyInPath := false
-			for _, room := range path {
-				if room == neighbor {
-					alreadyInPath = true
-					break
-				}
-			}
-			if !alreadyInPath {
-				newPath := append([]*Room{}, path...)
-				newPath = append(newPath, neighbor)
-				queue = append(queue, newPath)
-			}
-		}
-	}
-	return paths
-}
 func ConvertToString(rooms [][]*Room) [][]string {
 	var stringRooms [][]string
 	var stringRoom []string
@@ -169,18 +135,6 @@ func ConvertToString(rooms [][]*Room) [][]string {
 
 	return stringRooms
 }
-
-func OptimizedPaths(rooms [][]*Room) [][]*Room {
-	var noCollision [][]*Room
-	for _, room := range rooms {
-		if !HasCollision(room, noCollision) {
-			noCollision = append(noCollision, room)
-		}
-	}
-
-	return noCollision
-}
-
 func noRepeat(t [][]string) [][]string {
 	size := 0
 	for i := range t {
@@ -191,10 +145,48 @@ func noRepeat(t [][]string) [][]string {
 	}
 	return t
 }
+func findNonCollidingPaths(inputPaths [][]*Room) [][]*Room {
+	optimalPaths := make([][][]*Room, len(inputPaths))
 
-// func deleteRepeatition(t [][]string) [][]string {
+	for i, path := range inputPaths {
+		nonCollidingPaths := make([][]*Room, 0)
+		nonCollidingPaths = append(nonCollidingPaths, path)
 
-// }
+		for _, otherPath := range inputPaths {
+			if hasCollision(path, otherPath) {
+				continue
+			}
+
+			nonCollidingPaths = append(nonCollidingPaths, otherPath)
+		}
+
+		optimalPaths[i] = nonCollidingPaths
+	}
+
+	longestPathIndex := 0
+	maxLength := 0
+
+	for i, paths := range optimalPaths {
+		if len(paths) > maxLength {
+			maxLength = len(paths)
+			longestPathIndex = i
+		}
+	}
+
+	correct := optimalPaths[longestPathIndex]
+
+	return (OptimizedPaths(correct))
+}
+
+func OptimizedPaths(rooms [][]*Room) [][]*Room {
+	var noCollision [][]*Room
+	for _, room := range rooms {
+		if !HasCollision(room, noCollision) {
+			noCollision = append(noCollision, room)
+		}
+	}
+	return noCollision
+}
 
 func HasCollision(room []*Room, Ways [][]*Room) bool {
 	for _, Way := range Ways {
@@ -204,6 +196,33 @@ func HasCollision(room []*Room, Ways [][]*Room) bool {
 	}
 	return false
 }
+func hasCollision(path1 []*Room, path2 []*Room) bool {
+	for i := 1; i < len(path1)-1; i++ {
+		for j := 1; j < len(path2)-1; j++ {
+			if path1[i].Name == path2[j].Name {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func IsCollision(room1, room2 []*Room) bool {
+	if len(room1) == len(room2) && len(room1) == 2 {
+		if room1[1] == room2[1] || room1[2] == room2[2] {
+			return true
+		}
+	}
+	for i := 1; i < len(room1)-1; i++ {
+		for j := 1; j < len(room2)-1; j++ {
+			if room1[i].Name == room2[j].Name {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func ConvertToValueSlice(roomsPointers []*Room) []Room {
 	var rooms []Room
 
@@ -216,10 +235,10 @@ func ConvertToValueSlice(roomsPointers []*Room) []Room {
 	return rooms
 }
 
-func IsCollision(room1, room2 []*Room) bool {
+func isCollision(room1, room2 []*Room) bool {
 	for i := 1; i < len(room1)-1; i++ {
 		for j := 1; j < len(room2)-1; j++ {
-			if room1[i].Name == room2[j].Name  {
+			if room1[i].Name == room2[j].Name {
 				return true
 			}
 		}
