@@ -7,24 +7,39 @@ import (
 
 func Lem_in_prog() {
 	filename := os.Args[1]
-	validFile, err := CheckValidityFile(filename)
-	if !validFile {
-		fmt.Printf("ERROR: invalid data format, %v \n", err)
-		return
+	lines, error := FileToTable(filename)
+	lines = linesWithoutExtraSpaces(lines)
+	lines = deleteComments(lines)
+	if len(lines) == 0 && error == nil {
+		fmt.Println("empty file")
+	} else if error == nil && len(lines) > 0 {
+		valid, answer := CheckValidityFile(lines)
+		if valid {
+			// fmt.Println(valid)
+			var anthill Ant
+
+			antsize, chambre, _, _ := parseFile(filename)
+			startRoom := StartRoom(chambre)
+			endRoom := EndRoom(chambre)
+			Allpaths := findPathsBFS(startRoom, endRoom)
+
+			PathOptimized := findNonCollidingPaths(Allpaths)
+			path_tab := ConvertToString(PathOptimized)
+			path_tab = noRepeat(path_tab)
+
+			anthill = anthill.Path(path_tab)
+			anthill.Ant_per_path(numAnts, path_tab)
+			anthill.Reorder(path_tab, antsize)
+			anthill.PrintSeq(path_tab)
+		} else {
+			fmt.Println(answer)
+		}
 	}
-	var anthill Ant
 
-	antsize, chambre, _, _ := parseFile(filename)
-	startRoom := StartRoom(chambre)
-	endRoom := EndRoom(chambre)
-	Allpaths := findPathsBFS(startRoom, endRoom)
+	// validFile, err := CheckValidityFile(filename)
+	// if !validFile {
+	// 	fmt.Printf("ERROR: invalid data format, %v \n", err)
+	// 	return
+	// }
 
-	PathOptimized := findNonCollidingPaths(Allpaths)
-	path_tab := ConvertToString(PathOptimized)
-	path_tab = noRepeat(path_tab)
-
-	anthill = anthill.Path(path_tab)
-	anthill.Ant_per_path(numAnts, path_tab)
-	anthill.Reorder(path_tab, antsize)
-	anthill.PrintSeq(path_tab)
 }

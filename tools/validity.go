@@ -1,19 +1,29 @@
 package lem_in
 
+// package main
+
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-var lastline bool
+type roomformat struct {
+	name    string
+	coord_x int
+	coord_y int
+}
 
-func FileToTable(filename string) []string {
+var tabrooms []roomformat
+
+func FileToTable(filename string) ([]string, error) {
 	var lines []string
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil
+		fmt.Println("Erreur: nous ne parvenons pas a lire le fichier" + filename)
+
 	} else {
 		example := bufio.NewScanner(file)
 
@@ -21,8 +31,47 @@ func FileToTable(filename string) []string {
 			lines = append(lines, example.Text())
 		}
 	}
-	return lines
+	return lines, err
 }
+
+func linesWithoutExtraSpaces(lines []string) (lineswithoutpaces []string) {
+	for i := 0; i < len(lines); i++ {
+		if lines[i] != "" {
+			lineswithoutpaces = append(lineswithoutpaces, lines[i])
+		}
+
+	}
+	return lineswithoutpaces
+}
+
+func trimspacesinlines(lines []string) (linestrimspaces []string) {
+	for i := 0; i < len(lines); i++ {
+		linestrimspaces = append(linestrimspaces, strings.TrimSpace(lines[i]))
+	}
+	return linestrimspaces
+}
+
+func deleteComments(lines []string) (lineswithoutcomments []string) {
+	for i := 0; i < len(lines); i++ {
+		if strings.HasPrefix(lines[i], "#") && lines[i][1] != '#' {
+			lines = append(lines[:i], lines[i+1:]...)
+		}
+	}
+	lineswithoutcomments = lines
+	return lineswithoutcomments
+}
+
+func dispatchingLinesAndRooms(lines []string) (rooms, links []string) {
+	for i := 1; i < len(lines); i++ {
+		if strings.Contains(lines[i], "-") {
+			links = append(links, lines[i])
+		} else {
+			rooms = append(rooms, lines[i])
+		}
+	}
+	return rooms, links
+}
+
 func StartAndEnd(lines []string) bool {
 	var start, end = 0, 0
 	for i := 0; i < len(lines); i++ {
@@ -34,11 +83,9 @@ func StartAndEnd(lines []string) bool {
 	}
 	return start == 1 && end == 1
 }
+
 func ReformateRooms(rooms []string) {
-	// fmt.Println(rooms)
-	if rooms[len(rooms)-1] == "##end" {
-		lastline = true
-	}
+
 	for j := len(rooms) - 1; j >= 1; j-- {
 		if rooms[j] == "##start" {
 			rooms[j-1], rooms[j], rooms[j+1] = rooms[j], rooms[j+1], rooms[j-1]
@@ -51,67 +98,99 @@ func ReformateRooms(rooms []string) {
 
 		}
 	}
-	// fmt.Println(rooms)
 }
-func Classification(lines []string) (rooms, links []string) {
-	for i := 1; i < len(lines); i++ {
-		if strings.Contains(lines[i], "-") {
-			links = append(links, lines[i])
-		} else {
-			rooms = append(rooms, lines[i])
+
+func samecoordxy(x, y int, tabrooms []roomformat) bool {
+	repeat := false
+	for i := 0; i < len(tabrooms); i++ {
+		room := tabrooms[i]
+
+		if room.coord_x == x && room.coord_y == y {
+			fmt.Println("x", x, "y", y)
+			repeat = true
 		}
 	}
-	ReformateRooms(rooms)
-	//delete start and end commmand
-	rooms = append(rooms[:0], rooms[1:]...)
+	return repeat
+}
 
-	if rooms[len(rooms)-1] == "##end" {
-		rooms = rooms[:len(rooms)-1]
-	} else {
-		rooms = append(rooms[:len(rooms)-2], rooms[len(rooms)-1:]...)
+func RoomAndLinksFormat(rooms, links []string) (bool, string) {
+	if len(rooms) == 0 || len(links) == 0 {
+		err := "no rooms/links found"
+		return false, err
 	}
-	//delete comment and other command
+	for i := 0; i < len(rooms); i++ {
+		if i == len(rooms)-1 {
+			if rooms[i] == "##start" || rooms[i] == "##end" {
+				return false, "no room for ##start/##end"
+			}
+		} else {
+			if (rooms[i] == "##start" && rooms[i+1] == "##end") || (rooms[i] == "##end" && rooms[i+1] == "##start") {
+				fmt.Println("here", rooms, i, i+1)
+				return false, "##start & ##end must not follow each other"
+			}
+		}
+	}
+	//reformate Rooms
+	ReformateRooms(rooms)
+
+	//delete command ##start & ##end
 	for i := 0; i < len(rooms); i++ {
 		if strings.HasPrefix(rooms[i], "#") {
 			rooms = append(rooms[:i], rooms[i+1:]...)
 		}
 	}
 
-	return rooms, links
-}
-func RoomAndLinksFormat(rooms, links []string) (bool, string) {
-	//name x y
 	names := make(map[string]bool)
+	// fmt.Println(rooms, "rooms")
 	for _, room := range rooms {
+
 		roomTable := strings.Split(room, " ")
+
 		if len(roomTable) != 3 {
-			return false, "invalid room"
+			err := "Error invalid room format:" + string(room[0])
+			return false, err
 		} else {
 			if names[roomTable[0]] {
-				return false, "invalid room"
+				err := "The room " + roomTable[0] + " already exists"
+				return false, err
 			} else {
 				names[roomTable[0]] = true
 			}
-			_, errx := strconv.Atoi(roomTable[1])
-			_, erry := strconv.Atoi(roomTable[2])
-			if (strings.HasPrefix(roomTable[0], "L") || strings.HasPrefix(roomTable[0], "#")) || errx != nil || erry != nil {
-				return false, "invalid room"
+			x, errx := strconv.Atoi(roomTable[1])
+			y, erry := strconv.Atoi(roomTable[2])
+			if strings.HasPrefix(roomTable[0], "L") || strings.HasPrefix(roomTable[0], "#") {
+				err := "A room must begin with neither L nor #"
+				return false, err
+
+			} else if errx != nil || erry != nil {
+				err := "x & y coordinates must be numeric"
+				return false, err
+			} else {
+				if samecoordxy(x, y, tabrooms) {
+					return false, "the rooms must not have the same x y coordinates" + roomTable[0] + " " + strconv.Itoa(x) + " " + strconv.Itoa(y)
+				}
+				chambre := roomformat{name: roomTable[0], coord_x: x, coord_y: y}
+				tabrooms = append(tabrooms, chambre)
+
 			}
 
 		}
 
 	}
+
 	//check links
 	for i := 0; i < len(links); i++ {
 		link := strings.Split(links[i], "-")
-		// fmt.Println(link,len(link))
 		if len(link) != 2 {
-			return false, "invalid link format"
+			err := "invalid link format " + link[i]
+			return false, err
 		} else {
 			if link[0] == link[1] {
-				return false, ""
+				err := "room connected to itself " + link[i]
+				return false, err
 			} else if !names[link[0]] || !names[link[1]] {
-				return false, "invalid link format"
+				err := "non-existent room name " + link[i]
+				return false, err
 			}
 		}
 	}
@@ -119,22 +198,52 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 	return true, ""
 }
 
-func CheckValidityFile(filename string) (valide bool, err string) {
-	lines := FileToTable(filename)
-	if lines == nil {
-		return false, "wrong file name"
-	}
+func CheckValidityFile(lines []string) (validity bool, answer string) {
+	// fmt.Println(lines,"first")
+	//delete empty lines
+	lines = linesWithoutExtraSpaces(lines)
+	// fmt.Println(lines, "delete /n")
+	//trim extra spaces in lines
+	lines = trimspacesinlines(lines)
+	// fmt.Println(lines, "trim space")
+	//delete all the comments
+	lines = deleteComments(lines)
+	// fmt.Println(lines, "delete comments")
+	//assign the first line of the table as the number of ants
 	number_of_ants, _ := strconv.Atoi(lines[0])
-	rooms, links := Classification(lines)
-	// validity := false
-	// fmt.Println(rooms)
+	// fmt.Println("number of ants", number_of_ants)
+	if number_of_ants > 0 {
+		if StartAndEnd(lines) {
+			rooms, links := dispatchingLinesAndRooms(lines)
+			validity, answer = RoomAndLinksFormat(rooms, links)
 
-	if !lastline {
-		if (number_of_ants > 0) && StartAndEnd(lines) {
-			validity, message := RoomAndLinksFormat(rooms, links)
-			valide, err = validity, message
+		} else {
+			validity, answer = false, "the ##start & ##end commands must each be 1."
 		}
 
+	} else {
+		validity, answer = false, "the number of ants must be in the first position, be numerical and exceed 0"
+
 	}
-	return valide, err
+	return validity, answer
 }
+// func main() {
+// 	if len(os.Args) == 2 {
+// 		lines, error := FileToTable(os.Args[1])
+// 		lines = linesWithoutExtraSpaces(lines)
+// 		lines = deleteComments(lines)
+// 		if len(lines) == 0 && error == nil {
+// 			fmt.Println("empty file")
+// 		} else if error == nil && len(lines) > 0 {
+// 			valid, answer := CheckValidityFile(lines)
+// 			if valid {
+// 				fmt.Println(valid)
+// 			} else {
+// 				fmt.Println(answer)
+// 			}
+// 		}
+// 	} else {
+// 		fmt.Println("Trop ou peu d'arguments")
+// 	}
+
+// }
