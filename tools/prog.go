@@ -10,8 +10,8 @@ func Lem_in_prog() {
 	lines, error := FileToTable(filename)
 	lines = linesWithoutExtraSpaces(lines)
 	lines = deleteComments(lines)
-	lines=trimspacesinlines(lines)
-	
+	lines = trimspacesinlines(lines)
+
 	if len(lines) == 0 && error == nil {
 		fmt.Println("empty file")
 	} else if error == nil && len(lines) > 0 {
@@ -35,7 +35,7 @@ func Lem_in_prog() {
 			anthill.Reorder(path_tab, antsize)
 			anthill.PrintSeq(path_tab)
 		} else {
-			fmt.Println(answer)
+			fmt.Printf("ERROR: invalid data format, %v", answer)
 		}
 	}
 

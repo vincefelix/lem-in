@@ -22,7 +22,7 @@ func FileToTable(filename string) ([]string, error) {
 	var lines []string
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Erreur: nous ne parvenons pas a lire le fichier" + filename)
+		fmt.Printf("ERROR: invalid data format, '%v' not found\n",filename)
 
 	} else {
 		example := bufio.NewScanner(file)
@@ -125,7 +125,6 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 			}
 		} else {
 			if (rooms[i] == "##start" && rooms[i+1] == "##end") || (rooms[i] == "##end" && rooms[i+1] == "##start") {
-				fmt.Println("here", rooms, i, i+1)
 				return false, "##start & ##end must not follow each other"
 			}
 		}
@@ -147,7 +146,7 @@ func RoomAndLinksFormat(rooms, links []string) (bool, string) {
 		roomTable := strings.Split(room, " ")
 
 		if len(roomTable) != 3 {
-			err := "Error invalid room format:" + string(room[0])
+			err := "invalid room format:" + string(room[0])
 			return false, err
 		} else {
 			if names[roomTable[0]] {
@@ -274,23 +273,4 @@ func CheckValidityFile(lines []string) (validity bool, answer string) {
 	return validity, answer
 }
 
-// func main() {
-// 	if len(os.Args) == 2 {
-// 		lines, error := FileToTable(os.Args[1])
-// 		lines = linesWithoutExtraSpaces(lines)
-// 		lines = deleteComments(lines)
-// 		if len(lines) == 0 && error == nil {
-// 			fmt.Println("empty file")
-// 		} else if error == nil && len(lines) > 0 {
-// 			valid, answer := CheckValidityFile(lines)
-// 			if valid {
-// 				fmt.Println(valid)
-// 			} else {
-// 				fmt.Println(answer)
-// 			}
-// 		}
-// 	} else {
-// 		fmt.Println("Trop ou peu d'arguments")
-// 	}
 
-// }
