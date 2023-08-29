@@ -7,7 +7,13 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Error: There is one error in the file")
+		}
+	}()
 	if len(os.Args) != 2 {
+
 		fmt.Println("Error: Review arguments")
 		return
 	}
